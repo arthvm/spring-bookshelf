@@ -7,13 +7,13 @@ interface InputProp extends ComponentProps<'input'> {
 export function Input({ icon, ...props }: InputProp) {
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleClick = () => {
+  function handleClick() {
     if (inputRef.current) {
       inputRef.current.focus()
     }
   }
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'Enter') {
       event.preventDefault()
       inputRef.current?.focus()
