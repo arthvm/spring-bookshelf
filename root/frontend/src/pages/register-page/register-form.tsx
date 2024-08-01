@@ -1,10 +1,12 @@
 import { Button } from '@/components/button'
 import { Input } from '@/components/input'
-import { api } from '@/lib/axios'
+import { useAuth } from '@/hooks/use-auth'
 import { ArrowRight, Lock, Mail, User } from 'lucide-react'
 import { FormEvent } from 'react'
 
 export function RegisterForm() {
+  const { signUp } = useAuth()
+
   async function registerUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
@@ -17,11 +19,7 @@ export function RegisterForm() {
     if (!username || !email || !password) return
 
     try {
-      await api.post('/register', {
-        username,
-        email,
-        password,
-      })
+      await signUp({ username, email, password })
     } catch (error) {
       console.log(error) // ADD ERROR TREATMENT LATER
     }

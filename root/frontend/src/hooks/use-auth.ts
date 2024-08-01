@@ -1,0 +1,63 @@
+import { api } from '@/lib/axios'
+import { useNavigate } from 'react-router-dom'
+import { getCookie, removeCookie, setCookie } from 'typescript-cookie'
+
+export function useAuth() {
+  const navigate = useNavigate()
+
+  const isAuthenticated = Boolean(getCookie('_auth'))
+
+  async function signIn({
+    email,
+    password,
+  }: {
+    email: string
+    password: string
+  }) {
+    const singinResponse = await api.post('/login', {
+      login: email,
+      password,
+    })
+
+    const jwt = singinResponse.data.token
+    setCookie('_auth', jwt, { expires: 30, secure: true })
+
+    navigate('/bookshelf')
+
+    return {
+      email: singinResponse.data.email,
+      username: singinResponse.data.username,
+    }
+  }
+
+  function signOut() {
+    removeCookie('_auth')
+
+    navigate('/login')
+  }
+
+  async function signUp({
+    username,
+    email,
+    password,
+  }: {
+    username: string
+    email: string
+    password: string
+  }) {
+    await api.post('/register', {
+      username,
+      email,
+      password,
+    })
+
+    await signIn({ email, password })
+  }
+
+  return {
+    isAuthenticated,
+    signIn,
+    signOut,
+    signUp,
+  }
+}

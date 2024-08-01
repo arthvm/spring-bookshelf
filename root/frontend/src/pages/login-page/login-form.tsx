@@ -1,10 +1,12 @@
 import { Button } from '@/components/button'
 import { Input } from '@/components/input'
-import { api } from '@/lib/axios'
+import { useAuth } from '@/hooks/use-auth'
 import { ArrowRight, Lock, Mail } from 'lucide-react'
 import { FormEvent } from 'react'
 
 export function LoginForm() {
+  const { signIn } = useAuth()
+
   async function loginUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
@@ -16,12 +18,7 @@ export function LoginForm() {
     if (!email || !password) return
 
     try {
-      const loginResponse = await api.post('/login', {
-        login: email,
-        password,
-      })
-
-      console.log(loginResponse.data.token) // SAVE TOKEN IN THE FUTURE
+      await signIn({ email, password })
     } catch (error) {
       console.log(error)
     }
