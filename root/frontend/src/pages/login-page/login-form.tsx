@@ -32,7 +32,7 @@ export function LoginForm() {
       <div className="space-y-2">
         <Input
           icon={<Mail className="size-5 text-slate-400" />}
-          placeholder="Username or Email"
+          placeholder="Email"
           type="email"
           name="email"
           required
