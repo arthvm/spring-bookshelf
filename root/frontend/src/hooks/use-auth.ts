@@ -24,7 +24,7 @@ export function useAuth() {
     setCookie('_auth', jwt, { expires: 30, secure: true })
     setCookie('user_name', singinResponse.data.username)
 
-    navigate(`/${singinResponse.data.username}/bookshelf`)
+    navigate(`/bookshelf`)
 
     return {
       email: singinResponse.data.email,
