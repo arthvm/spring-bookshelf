@@ -6,6 +6,7 @@ export function useAuth() {
   const navigate = useNavigate()
 
   const isAuthenticated = Boolean(getCookie('_auth'))
+  const username = String(getCookie('user_name'))
 
   async function signIn({
     email,
@@ -21,8 +22,9 @@ export function useAuth() {
 
     const jwt = singinResponse.data.token
     setCookie('_auth', jwt, { expires: 30, secure: true })
+    setCookie('user_name', singinResponse.data.username)
 
-    navigate('/bookshelf')
+    navigate(`/${singinResponse.data.username}/bookshelf`)
 
     return {
       email: singinResponse.data.email,
@@ -32,6 +34,7 @@ export function useAuth() {
 
   function signOut() {
     removeCookie('_auth')
+    removeCookie('user_name')
 
     navigate('/login')
   }
@@ -55,6 +58,7 @@ export function useAuth() {
   }
 
   return {
+    username,
     isAuthenticated,
     signIn,
     signOut,

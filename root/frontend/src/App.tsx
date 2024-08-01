@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import './index.css'
 import { LogInPage } from './pages/login-page'
 import { RegisterPage } from './pages/register-page'
+import { PrivateRoute } from './routes/private-route'
 import { PublicRoute } from './routes/public-route'
 
 const router = createBrowserRouter([
@@ -20,6 +21,19 @@ const router = createBrowserRouter([
       {
         path: 'register',
         element: <RegisterPage />,
+      },
+    ],
+  },
+  {
+    path: '/',
+    element: <PrivateRoute />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/bookshelf" replace />,
+      },
+      {
+        path: 'bookshelf',
       },
     ],
   },

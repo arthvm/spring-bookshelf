@@ -5,7 +5,7 @@ export function PublicRoute() {
   const { isAuthenticated } = useAuth()
 
   if (isAuthenticated) {
-    return <Navigate to={'/bookshelf'} />
+    return <Navigate to={`/bookshelf`} replace />
   }
 
   return (
