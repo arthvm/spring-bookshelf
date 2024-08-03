@@ -16,7 +16,7 @@ export function useAuth() {
     password: string
   }) {
     const singinResponse = await api.post('/login', {
-      login: email,
+      email,
       password,
     })
 

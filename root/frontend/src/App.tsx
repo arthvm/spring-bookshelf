@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import './index.css'
+import { BookshelfPage } from './pages/bookshelf-page'
 import { LogInPage } from './pages/login-page'
 import { RegisterPage } from './pages/register-page'
 import { PrivateRoute } from './routes/private-route'
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'bookshelf',
+        element: <BookshelfPage />,
       },
     ],
   },
