@@ -1,11 +1,12 @@
 import { BookCard } from '@/components/book-card'
 import { Input } from '@/components/input'
 import { useAuth } from '@/hooks/use-auth'
+import { useDebounce } from '@/hooks/use-debounce'
 import { IBook } from '@/interfaces/IBook'
 import { api } from '@/lib/axios'
 import { useQuery } from '@tanstack/react-query'
-import { Book, Frown, LogOut, Search } from 'lucide-react'
-import { useState } from 'react'
+import { Book, BookMarked, LogOut, Search } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 async function getUserBooks() {
   try {
@@ -16,6 +17,37 @@ async function getUserBooks() {
     console.log(error) // ADD ERROR TREATMENT
   }
 } // PROD
+
+async function getSearchBooks(bookTitle: string) {
+  interface DataType {
+    api_id: string
+    title: string
+    publishedDate: Date
+    publisher: string
+    summary: string
+    totalPages: number
+    author: string
+    poster_url: string
+  }
+
+  try {
+    const booksResponse = await api.get(`/books/${bookTitle}`)
+
+    const data: DataType[] = booksResponse.data
+    const formattedData = data.map((book) => {
+      const { api_id: givenID, ...bookWithoutID } = {
+        ...book,
+        author: { name: book.author, id: 0 },
+      }
+
+      return { ...bookWithoutID, id: givenID }
+    })
+
+    return formattedData
+  } catch (err) {
+    console.log(err)
+  }
+}
 
 // async function getUserBooks() {
 //   return [
@@ -174,11 +206,24 @@ async function getUserBooks() {
 
 export function BookshelfPage() {
   const { signOut } = useAuth()
+
   const { data: userBooks } = useQuery<IBook[]>({
     queryKey: ['userBooks'],
     queryFn: getUserBooks,
   })
+  const [searchResult, setSearchResult] = useState<IBook[]>([])
+
   const [searchValue, setSearchValue] = useState('')
+  const debouncedSearch = useDebounce(searchValue)
+
+  useEffect(() => {
+    if (!debouncedSearch) {
+      setSearchResult([])
+      return
+    }
+
+    getSearchBooks(debouncedSearch).then((data) => setSearchResult(data ?? []))
+  }, [debouncedSearch])
 
   return (
     <div className="flex flex-col max-h-screen">
@@ -199,14 +244,21 @@ export function BookshelfPage() {
 
       <div className="h-[.5px] bg-slate-800 mx-4 mt-2 mb-4" />
 
-      <div className="flex gap-2 px-4 text-slate-600">
-        <Book className="size-5 inline" />
-        <p className="text-sm">{userBooks?.length} books saved</p>
-      </div>
+      {debouncedSearch ? (
+        <div className="flex gap-2 px-4 text-slate-600">
+          <Book className="size-5 inline" />
+          <p className="text-sm">{searchResult?.length} books found</p>
+        </div>
+      ) : (
+        <div className="flex gap-2 px-4 text-slate-600">
+          <BookMarked className="size-5 inline" />
+          <p className="text-sm">{userBooks?.length} books saved</p>
+        </div>
+      )}
 
-      {userBooks?.length ? (
+      {debouncedSearch ? (
         <div className="space-y-4 px-4 my-4 overflow-y-scroll">
-          {userBooks?.map((book) => (
+          {searchResult?.map((book) => (
             <BookCard
               key={book.id}
               title={book.title}
@@ -216,9 +268,15 @@ export function BookshelfPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col h-screen gap-2 items-center justify-center">
-          <Frown className="size-20 text-slate-600" />
-          <p className="text-center text-slate-600">No books saved yet...</p>
+        <div className="space-y-4 px-4 my-4 overflow-y-scroll">
+          {userBooks?.map((book) => (
+            <BookCard
+              key={book.id}
+              title={book.title}
+              authorName={book.author.name}
+              coverUrl={book.poster_url}
+            />
+          ))}
         </div>
       )}
     </div>
