@@ -1,10 +1,33 @@
 import { ComponentProps, ReactNode, useRef } from 'react'
+import { tv, VariantProps } from 'tailwind-variants'
 
-interface InputProp extends ComponentProps<'input'> {
+const inputVariants = tv({
+  base: 'py-2 text-lg text-slate-50 flex items-center justify-start gap-2 w-full',
+
+  variants: {
+    variant: {
+      default: 'border-none',
+      outlined: 'border border-slate-800 rounded-2xl px-4',
+    },
+    maxSize: {
+      default: `md:w-96`,
+      none: ``,
+    },
+  },
+
+  defaultVariants: {
+    variant: 'default',
+    maxSize: 'default',
+  },
+})
+
+interface InputProp
+  extends ComponentProps<'input'>,
+    VariantProps<typeof inputVariants> {
   icon?: ReactNode
 }
 
-export function Input({ icon, ...props }: InputProp) {
+export function Input({ icon, variant, maxSize, ...props }: InputProp) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleClick() {
@@ -21,7 +44,7 @@ export function Input({ icon, ...props }: InputProp) {
   }
 
   return (
-    <div className="py-2 text-lg text-slate-50 flex items-center justify-start gap-2 md:w-96">
+    <div className={inputVariants({ variant, maxSize })}>
       <div
         onClick={handleClick}
         onKeyDown={handleKeyDown}

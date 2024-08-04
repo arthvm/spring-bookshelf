@@ -1,83 +1,226 @@
 import { BookCard } from '@/components/book-card'
+import { Input } from '@/components/input'
 import { useAuth } from '@/hooks/use-auth'
 import { IBook } from '@/interfaces/IBook'
 import { api } from '@/lib/axios'
+import { useQuery } from '@tanstack/react-query'
 import { Book, Frown, LogOut, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+
+async function getUserBooks() {
+  try {
+    const booksResponse = await api.get('/books/user/all')
+
+    return booksResponse.data
+  } catch (error) {
+    console.log(error) // ADD ERROR TREATMENT
+  }
+} // PROD
+
+// async function getUserBooks() {
+//   return [
+//     {
+//       id: 1,
+//       title: 'A Revolução dos Bichos',
+//       publishedDate: new Date('1945-08-17'),
+//       publisher: 'Secker & Warburg',
+//       summary:
+//         'Um grupo de animais de uma fazenda se rebela contra seus donos humanos, estabelecendo um regime próprio, que rapidamente se corrompe.',
+//       totalPages: 112,
+//       author: {
+//         id: 1,
+//         name: 'George Orwell',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 2,
+//       title: '1984',
+//       publishedDate: new Date('1949-06-08'),
+//       publisher: 'Secker & Warburg',
+//       summary:
+//         'Um clássico da literatura distópica que explora a vigilância totalitária, a repressão política e a manipulação da verdade.',
+//       totalPages: 328,
+//       author: {
+//         id: 1,
+//         name: 'George Orwell',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 3,
+//       title: 'O Hobbit',
+//       publishedDate: new Date('1937-09-21'),
+//       publisher: 'George Allen & Unwin',
+//       summary:
+//         'Bilbo Bolseiro embarca em uma aventura inesperada com um grupo de anões para recuperar um tesouro guardado pelo dragão Smaug.',
+//       totalPages: 310,
+//       author: {
+//         id: 2,
+//         name: 'J.R.R. Tolkien',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 4,
+//       title: 'Dom Quixote',
+//       publishedDate: new Date('1605-01-16'),
+//       publisher: 'Francisco de Robles',
+//       summary:
+//         'A história de um cavaleiro que se perde em um mundo de fantasia e realiza feitos heroicos imaginários.',
+//       totalPages: 992,
+//       author: {
+//         id: 3,
+//         name: 'Miguel de Cervantes',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 5,
+//       title: 'Orgulho e Preconceito',
+//       publishedDate: new Date('1813-01-28'),
+//       publisher: 'T. Egerton, Whitehall',
+//       summary:
+//         'A história de Elizabeth Bennet enquanto ela lida com questões de moralidade, educação, casamento e riqueza.',
+//       totalPages: 279,
+//       author: {
+//         id: 4,
+//         name: 'Jane Austen',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 6,
+//       title: 'Moby Dick',
+//       publishedDate: new Date('1851-10-18'),
+//       publisher: 'Richard Bentley',
+//       summary:
+//         'A busca obsessiva do Capitão Ahab pela grande baleia branca, Moby Dick.',
+//       totalPages: 635,
+//       author: {
+//         id: 5,
+//         name: 'Herman Melville',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 7,
+//       title: 'O Senhor dos Anéis: A Sociedade do Anel',
+//       publishedDate: new Date('1954-07-29'),
+//       publisher: 'George Allen & Unwin',
+//       summary:
+//         'A primeira parte da épica trilogia de fantasia, onde Frodo Bolseiro inicia sua jornada para destruir o Um Anel.',
+//       totalPages: 423,
+//       author: {
+//         id: 2,
+//         name: 'J.R.R. Tolkien',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 8,
+//       title: 'Crime e Castigo',
+//       publishedDate: new Date('1866-01-01'),
+//       publisher: 'The Russian Messenger',
+//       summary:
+//         'Um jovem estudante em São Petersburgo planeja e executa um assassinato, seguido por sua culpa e sofrimento.',
+//       totalPages: 671,
+//       author: {
+//         id: 6,
+//         name: 'Fiódor Dostoiévski',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 9,
+//       title: 'O Sol é Para Todos',
+//       publishedDate: new Date('1960-07-11'),
+//       publisher: 'J.B. Lippincott & Co.',
+//       summary:
+//         'Uma jovem menina no sul dos Estados Unidos durante os anos 1930 observa os desafios da justiça racial em sua cidade.',
+//       totalPages: 281,
+//       author: {
+//         id: 7,
+//         name: 'Harper Lee',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//     {
+//       id: 10,
+//       title: 'A Metamorfose',
+//       publishedDate: new Date('1915-10-17'),
+//       publisher: 'Verlag Kurt Wolff',
+//       summary:
+//         'A história de Gregor Samsa, que acorda uma manhã transformado em um inseto gigante.',
+//       totalPages: 201,
+//       author: {
+//         id: 8,
+//         name: 'Franz Kafka',
+//       },
+//       poster_url:
+//         'https://m.media-amazon.com/images/I/71V2v2GtAtL._AC_UF1000,1000_QL80_.jpg',
+//     },
+//   ]
+// } // DEV
 
 export function BookshelfPage() {
-  const { username, signOut } = useAuth()
-  const [books, setBooks] = useState<IBook[]>([])
-
-  async function getUserBooks() {
-    try {
-      const booksResponse = await api.get('/books/user/all')
-
-      return booksResponse.data
-    } catch (error) {
-      console.log(error) // ADD ERROR TREATMENT
-    }
-  }
-
-  async function deleteBookFromLibrary(bookId: number) {
-    try {
-      await api.delete(`/books/delete?book_id=${bookId}`)
-    } catch (error) {
-      console.log(error) // ADD ERROR TREATMENT
-    }
-  }
-
-  useEffect(() => {
-    getUserBooks().then((data) => setBooks(data))
-  }, [])
+  const { signOut } = useAuth()
+  const { data: userBooks } = useQuery<IBook[]>({
+    queryKey: ['userBooks'],
+    queryFn: getUserBooks,
+  })
+  const [searchValue, setSearchValue] = useState('')
 
   return (
-    <>
-      <div className="py-4 px-4 h-screen flex flex-col">
-        <header className="w-full flex justify-between ">
-          <span className="text-zinc-50 text-lg">@{username}</span>
-          <div className="flex gap-4 items-center">
-            <Search className="size-7 text-slate-50" />
-            <button onClick={() => signOut()} title="LogOut">
-              <LogOut className="size-7 text-slate-50" />
-            </button>
-          </div>
-        </header>
+    <div className="flex flex-col max-h-screen">
+      <header className="flex gap-4 text-slate-50 items-center justify-between px-4 py-2">
+        <Input
+          value={searchValue}
+          onChange={(event) => setSearchValue(event.target.value)}
+          variant="outlined"
+          icon={<Search />}
+          placeholder="Search for a book..."
+          maxSize="none"
+        />
 
-        <div className="mt-5 mb-2 flex gap-2 text-slate-400 items-center">
-          <Book className="size-5" />
-          <p className="text-sm">
-            {books.length
-              ? `${books.length} books saved`
-              : 'No books saved yet'}
-          </p>
-        </div>
+        <button onClick={() => signOut()} type="button" title="LogOut">
+          <LogOut className="size-7" />
+        </button>
+      </header>
 
-        <div className="py-[1px] bg-slate-800" />
+      <div className="h-[.5px] bg-slate-800 mx-4 mt-2 mb-4" />
 
-        {books.length ? (
-          <div className="flex flex-col gap-8 px-4 py-6 overflow-y-auto">
-            {books.map((book) => {
-              return (
-                <BookCard
-                  key={book.id}
-                  title={book.title}
-                  authorName={book.author.name}
-                  coverUrl={book.poster_url}
-                  handleDelete={() => deleteBookFromLibrary(book.id)}
-                />
-              )
-            })}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-5 text-slate-500 w-full h-full items-center justify-center text-center">
-            <Frown className="size-20" />
-            <p className="max-w-[70%]">
-              Seems like you don&apos;t have any books saved yet...
-            </p>
-          </div>
-        )}
+      <div className="flex gap-2 px-4 text-slate-600">
+        <Book className="size-5 inline" />
+        <p className="text-sm">{userBooks?.length} books saved</p>
       </div>
-    </>
+
+      {userBooks?.length ? (
+        <div className="space-y-4 px-4 my-4 overflow-y-scroll">
+          {userBooks?.map((book) => (
+            <BookCard
+              key={book.id}
+              title={book.title}
+              authorName={book.author.name}
+              coverUrl={book.poster_url}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col h-screen gap-2 items-center justify-center">
+          <Frown className="size-20 text-slate-600" />
+          <p className="text-center text-slate-600">No books saved yet...</p>
+        </div>
+      )}
+    </div>
   )
 }
