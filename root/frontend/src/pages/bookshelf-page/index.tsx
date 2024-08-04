@@ -247,12 +247,12 @@ export function BookshelfPage() {
       {debouncedSearch ? (
         <div className="flex gap-2 px-4 text-slate-600">
           <Book className="size-5 inline" />
-          <p className="text-sm">{searchResult?.length} books found</p>
+          <p className="text-sm">{searchResult?.length ?? '0'} books found</p>
         </div>
       ) : (
         <div className="flex gap-2 px-4 text-slate-600">
           <BookMarked className="size-5 inline" />
-          <p className="text-sm">{userBooks?.length} books saved</p>
+          <p className="text-sm">{userBooks?.length ?? '0'} books saved</p>
         </div>
       )}
 
