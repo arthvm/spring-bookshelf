@@ -1,12 +1,10 @@
-import { IAuthor } from './IAuthor'
-
 export interface IBook {
-  id: number | string
+  id: string
   title: string
   publishedDate: Date
   publisher: string
   summary: string
   totalPages: number
-  author: IAuthor
+  author: string
   poster_url: string
 }
